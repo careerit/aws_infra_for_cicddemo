@@ -1,0 +1,27 @@
+---
+- hosts: "{{ variable_host | default('webservers') }}"
+  become: yes
+  become_method: sudo
+  remote_user: '{{ user }}'
+
+  tasks:
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day 
+
+  - name: install dependencies 
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - ruby-full 
+      - unzip  
+  - name: download & unarchive
+    unarchive:
+      src: '{{ https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install }}'
+      dest: /home/ubuntu/
+
+
+       
