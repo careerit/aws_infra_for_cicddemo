@@ -17,3 +17,19 @@ data "aws_ami" "ubuntu" {
 
   owners = ["099720109477"] # Canonical
 }
+
+
+
+# Key Pair
+
+data "template_file" "mainkey" {
+  template = file(var.public_key_path)
+
+}
+
+
+resource "aws_key_pair" "mainkey" {
+    key_name = "cloudopskey2"
+    public_key = data.template_file.mainkey.rendered 
+
+}

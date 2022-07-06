@@ -9,12 +9,6 @@ data "template_file" "web_user_data" {
 }
 
 
-resource "aws_key_pair" "mainkey" {
-    key_name = "mycloudopskey"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDhAGXtb6fJT/aUdCdMcMt5wgJHI9Fhnwo03o4kIHGkE23U3OjCU/NvzG8zM2duZgVW8sR1diNCTPL0xCc5JH3bmuLIhovyEm6jRQREedBYQiuDnFirMCvB1uEjqaUWpmP39zUGiD28dQ88cdFGVTqbmhiSK6Ron4H4AI61tGROcxC0fijYZUPSKIxL5/OqZb3uk1L2FAKeXFgfwqEuShartlMKWUXuLb9NZD9q7N/xe9+WzNizHs4YPN+ROoDJ71hlR2lFqGXoVF31aQxNO9aGx3ALS0IBdd3PvBTFYf+EUv3ZQRTeH+VAavW8rcAbOJKqX5DU72LqF4KSxLtE8PjdJS+673Z/uaPp8ZiPPTDOPk9vpT733Ux2fB8QhTgEEGsi38oIv6wfmuVCKp/mNPB+SQUolTt+b+OP+JSBkB2Ui86CI89uYG5wSTuZ9j3cWcXnup/DpsIwBrZzIKbJuQtRNEeDH/X6eznSrnwnBMCN2sD6CYm+RjDvmgZsfxSpAUc= kk@kmachine"
-
-}
-
 resource "aws_network_interface" "bastion" {
   subnet_id       = aws_subnet.public[1].id
   security_groups = [aws_security_group.bastion.id]
@@ -47,11 +41,11 @@ resource "aws_instance" "bastion" {
 }
 
 data "aws_iam_role" "ec2role" {
-  name = "Ec2InstanceRole2"
+  name = "Ec2InstanceRole"
 }
 
 resource "aws_iam_instance_profile" "webprofile" {
-  name = "web_profile"
+  name = "webinstanceprofile"
   role = data.aws_iam_role.ec2role.name
 }
 

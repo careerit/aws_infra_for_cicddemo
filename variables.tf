@@ -1,3 +1,8 @@
+variable "region" {
+  type = string
+  description = "Region where resources are to be created"
+  default = "us-east-1"
+}
 
 
 variable "environment" {
@@ -106,4 +111,9 @@ variable "db_node_size" {
 variable "db_sg_rules" {
   type    = list(string)
   default = ["3306"]
+}
+
+variable "public_key_path" {
+  
+  description = "Path to the SSH public key"
 }
