@@ -19,10 +19,15 @@
       state: present
     loop:
       - openjdk-11-jdk
-      - unzip
-      - tree
-      - python3-pip
       - apache2
+
+  - name: enabled proxy mods
+    apache2_module:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - proxy
+      - proxy_http
 
   - name: add tomcat group
     group:
@@ -65,11 +70,30 @@
        src: tomcat.service
        dest: /etc/systemd/system/
        mode: 0755
-       
 
   - name: Start and enable Tomcat service
     systemd:
       name: tomcat
       state: started
+      enabled: true
+      daemon_reload: true
+
+  - name: Update apache config
+    lineinfile:
+      path: /etc/apache2/sites-enabled/000-default.conf
+      line: '    ProxyPreserveHost On'
+      insertbefore: '</VirtualHost>'
+      
+
+  - name: Update apache config2
+    lineinfile:
+      path: /etc/apache2/sites-enabled/000-default.conf
+      line: '    ProxyPass / http://localhost:8080/'
+      insertafter: '    ProxyPreserveHost On'
+      
+  - name: Restart apache2 service
+    systemd:
+      name: apache2
+      state: restarted
       enabled: true
       daemon_reload: true
