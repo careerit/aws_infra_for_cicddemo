@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ssh_key="/opt/lab/keys/mycloudops"
+ssh_key="/opt/lab/keys/opskey"
 hostsFile="hosts"
 
 terraform validate 
@@ -11,6 +11,7 @@ then
     terraform apply --auto-approve
     
 else
+    
     echo "Terraform Validation failed. exit Status: $?"
     exit
 fi
@@ -21,7 +22,6 @@ bastionIP=$(terraform output -raw bastion_Public_IP)
 
 # Get the LB DNS Name
 albDNS=$(terraform output -raw alb_dns)
-
 
 # Generate hosts file
 echo -e "[webservers]" > $hostsFile
@@ -40,13 +40,28 @@ do
 done
 
 
-
 # Copy SSH Config file into the Server
-rsync -avz --ignore-existing -e "ssh -i ${ssh_key} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress ./tomcat_deploy/sshconfig ubuntu@${bastionIP}:~/.ssh/config
- 
-# Copy ssh Key for authentication with controlled nodes
-rsync -avz --ignore-existing -e "ssh -i ${ssh_key} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress  ${ssh_key} ubuntu@${bastionIP}:~/
-
 
 # Copy hosts file to the ansible controller.
-rsync -avz -e "ssh -i ${ssh_key} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress  ./tomcat_deploy ubuntu@${bastionIP}:~/
+rsync -avz -e "ssh -i ${ssh_key} -o StrictHostKeyChecking=no \
+      -o UserKnownHostsFile=/dev/null" \
+      --progress  ./tomcat_deploy ubuntu@${bastionIP}:~/
+
+
+rsync -avz --ignore-existing -e "ssh -i ${ssh_key} \
+     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+     --progress ./tomcat_deploy/sshconfig ubuntu@${bastionIP}:~/.ssh/config
+ 
+# Copy ssh Key for authentication with controlled nodes
+rsync -avz --ignore-existing -e "ssh -i ${ssh_key} \
+      -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+      --progress  ${ssh_key} ubuntu@${bastionIP}:~/tomcat_deploy/
+
+
+# Sample playbook
+
+ssh -i ${ssh_key} ubuntu@${bastionIP} /bin/bash << EOF
+ cd tomcat_deploy 
+
+ ansible-playbook -i ./hosts tomcat_playbook.yaml --private-key opskey
+EOF
