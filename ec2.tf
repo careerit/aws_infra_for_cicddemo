@@ -67,7 +67,6 @@ resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.web_node_size
   key_name      = aws_key_pair.mainkey.key_name
-  user_data       = base64encode(data.template_file.web_user_data.rendered)  
   iam_instance_profile = aws_iam_instance_profile.webprofile.name
   depends_on    = [aws_nat_gateway.mynatgw]
   network_interface {
