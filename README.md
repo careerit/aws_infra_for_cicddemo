@@ -57,3 +57,44 @@ terraform apply
 
 
 
+
+
+
+## Install Apache
+
+- Install apache2 
+```bash
+sudo apt-get install apache2 -y
+```
+
+- Enable apache modules
+
+```bash
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+```
+
+* Virtual Host forwarding.
+
+```bash
+cd /etc/apache2/sites-enabled
+```
+
+Create file in `/etc/apache2/sites-enabled` with the  name `000-default.conf` with the below content
+
+```java
+<VIRTUALHOST *:80>
+
+    ProxyPreserveHost On
+
+    # ...
+
+    ProxyPass / http://localhost:8080/
+</VIRTUALHOST>
+```
+
+
+Restart apache2
+
+```bash
+sudo systemctl restart apache
