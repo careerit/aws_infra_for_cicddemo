@@ -3,7 +3,7 @@ resource "aws_route_table" "pubroute" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    ngateway_id = aws_internet_gateway.myigw.id
+    gateway_id = aws_internet_gateway.myigw.id
   }
 
   tags = {
